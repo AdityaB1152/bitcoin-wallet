@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import logo from '../../assets/logo.png' 
 import { FaSync } from 'react-icons/fa';
@@ -33,9 +33,11 @@ const SyncButton = styled.button`
 `;
 
 const Navbar: React.FC = () => {
+
+  const [syncStatus , setSyncStatus] = useState<string>('Synced')
+
   const handleSync = () => {
-    // Implement sync functionality here
-    console.log("Syncing...");
+    
   };
 
   return (

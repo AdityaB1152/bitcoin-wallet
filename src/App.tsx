@@ -4,12 +4,15 @@ import './App.css';
 import Sidebar from './Components/Sidebar';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Wallet from './Pages/Wallet';
+import {Provider} from 'react-redux'
 import Transactions from './Pages/Transactions';
 import Navbar from './Components/NavBar/NavBar';
+import store from './store';
 
 
 function App() {
   return (
+    <Provider store={store}>
     <Router>
       <div>
         <Navbar/>
@@ -24,6 +27,7 @@ function App() {
         </div>
       </div>
     </Router>
+    </Provider>
   );
 }
 
