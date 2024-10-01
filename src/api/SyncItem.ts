@@ -30,16 +30,18 @@ export const processSyncItems = async () => {
                 , transactions:history
             }))
         }
-
-        store.dispatch(processNextSyncItem()); 
-
-        await new Promise((resolve) => setTimeout(resolve, 200)).then(()=>{
-            processSyncItems();
-        })
+        
     }
         catch(error){
 
             console.log('Error',error);
+            const syncItem = syncQueue[0];
+            store.dispatch(addSyncItem(syncItem));
+        } finally {
+            store.dispatch(processNextSyncItem());
+            await new Promise((resolve) => setTimeout(resolve, 200)).then(()=>{
+                processSyncItems();
+            }) 
         }
     
 
