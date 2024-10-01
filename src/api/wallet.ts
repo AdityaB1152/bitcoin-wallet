@@ -1,82 +1,85 @@
-import {BIP32Factory} from 'bip32'
-import * as ecc from 'tiny-secp256k1'
-import axios from 'axios';
-import * as bip39 from 'bip39'
-import * as  bitcoin from 'bitcoinjs-lib'
+import * as axios from 'axios'
+import store from '../store';
+import { addWallet } from '../slices/walletSlice';
+import { addSyncItem, setSyncStatus } from '../slices/syncQueueSlice';
+import { processSyncItems } from './SyncItem';
+let tempWalletAdd = 'n1SNK7QJkoN6yPWPb4ZmNpRCkcQDTCg46s'
+const req = axios.default
+const BASE_URL = 'http://localhost:5000'
 
-const bip32 = BIP32Factory(ecc);
+
+export const handleWalletImport = async (name:string , mnemonic:string) => {
+        console.log('Calling')
+    await generateWalletAddress(mnemonic).then((address)=>{
+        
+        console.log(`Retrived Wallet Address from Mnemonic:${address}`);
 
 
+    let wallet  = {
+        name:name,
+        address:address
+    }
+    console.log('Wallet Imported',wallet);
+    
+    store.dispatch(addWallet(wallet));
 
-const network = bitcoin.networks.testnet
+    store.dispatch(
+        addSyncItem({
+            walletAddress:address,
+            type:'balance'
+        })
+    );
 
-const generateWalletAddress = (mnemonic:string) => {
+    store.dispatch(
+        addSyncItem({
+            walletAddress:address,
+            type:'history'
+        })
+    );
 
-    const seed = bip39.mnemonicToSeedSync(mnemonic);
-    const root = bip32.fromSeed(seed);
-
-    const path = `m/44'/1'/0'/0/0`;
-
-    const child = root.derivePath(path);
-    const {address} = bitcoin.payments.p2pkh({
-        pubkey:child.publicKey , network:bitcoin.networks.testnet
+    store.dispatch(setSyncStatus('syncing'));
+    }).then(()=>{
+         processSyncItems();
+    
     });
 
+  
 
-    return address;
 
 }
 
- const getBalance = async (address:string) => {
-    try{
-        const response = await axios.get("",);
-
-        return response.data.balance;
-    }
-    catch(error){
-        console.log("Error fetching balance:", error);
-        throw error;
-    }
-}
-
-const getAllBalance = async (addresses:string[]) => {
-        try {
-            const balancePromises = addresses.map((address)=>getBalance(address));
-            const balances = await Promise.all(balancePromises);
-            return balances;
-
-        }
-        catch (error){
-            console.log('Error fetching the balance for multiple addresses:',error);
-        }
-}
-
-const getTransactions = async (address:string)=>{
+const generateWalletAddress = async (mnemonic:string) => {
     try {
-        const response = await axios.get('');
-        return response.data.txrefs;
-    } catch (error){
-        console.log('Error fetching transactions:',error);
-    }
+        const response = await req.post(`${BASE_URL}/generateAddress`,{
+        seed:mnemonic
+            });
+            return response.data.address;
+
+} catch(error) {
+    console.error("Error fetching address:",error);
+}
 }
 
-const getAllTransactions = async (addresses:string []) => {
-    try {
-        const transactionPromises = addresses.map((address)=>getTransactions(address));
-        const transactions = await Promise.all(transactionPromises)
-        return transactions;
-    } catch (error) {
-        console.log(error);
-    }
+export const fetchBalance = async (walletAddress:string) => {
+
+        try{
+            const resp = await req.post(`${BASE_URL}/getBalance`,{
+                walletAddress:tempWalletAdd
+            });
+            return resp.data.balance;
+        } catch(error){
+            console.log(`Error fetching balance for ${walletAddress}`,error);
+        }
+
 }
 
-export {
-  generateWalletAddress ,
-  getBalance,
-  getAllBalance,
-  getTransactions ,
-  getAllTransactions
+export const fetchHistory = async (walletAddress:string) =>{
+        try{
+            const resp = await req.post(`${BASE_URL}/getTransactions`,{
+                walletAddress:tempWalletAdd
+            });
+            return resp.data.transactions;
+        } catch(error){
+            console.log(`Error fetching Transactions for ${walletAddress}`);
+        }
 }
-
-
-

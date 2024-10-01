@@ -17,7 +17,7 @@ function App() {
       <div>
         <Navbar/>
       </div>
-      <div style={{ display: 'flex' ,height:'100%', backgroundColor:'#282c34' }}>
+      <div style={{ display: 'flex' ,height:'100%', backgroundColor:'#161C23' }}>
         <Sidebar />
         <div style={{ flex: 1, padding: '20px' }}>
           <Routes>

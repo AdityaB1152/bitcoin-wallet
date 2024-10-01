@@ -1,79 +1,47 @@
-import axios from "axios";
-import { generateWalletAddress, getBalance, getTransactions } from "./wallet";
-import { mnemonicToSeed, validateMnemonic } from "bip39";
+import { stat } from "fs";
+import store from "../store"
+import { processNextSyncItem, setSyncStatus } from "../slices/syncQueueSlice";
+import { fetchBalance, fetchHistory } from "./wallet";
+import { setBalance, setTransactions } from "../slices/balanceTransactionSlice";
 
-interface SyncItems {
-    walletAddress : string;
-    type : 'balance'|'history';
-}
+export const processSyncItems = async () => {
+    const state = store.getState();
+    const syncQueue = state.syncQueue.queue;
 
-interface BalanceSyncItem extends SyncItems {
-    type : 'balance';
-}
-
-interface HistorySyncItem extends SyncItems {
-    type : 'history'
-}
-
-let syncQueue: SyncItems [] = [];
-
-const addToQueue = (walletAddress:string | any) => {
-
-    const balanceSyncItem:BalanceSyncItem = {walletAddress , type:'balance'};
-    syncQueue.push(balanceSyncItem);
-
-    const historySyncItem:HistorySyncItem = {walletAddress , type:'history'};
-    syncQueue.push(historySyncItem);
-}
-
-const processSyncQueue = async () => {
-    while(syncQueue.length > 0){
-        const syncItem = syncQueue.shift();
-
-        if(!syncItem) return;
-        try {
-            if(syncItem.type == 'balance'){
-                await fetchBalance(syncItem.walletAddress);
-
-            }
-            else if(syncItem.type == 'history'){
-                await fetchTransactionHistory(syncItem.walletAddress);
-            }
-        } catch (error) {
-
-        }
-    }
-}
-
-const fetchBalance = async (walletAddress:string) => {
-    const balance = await getBalance(walletAddress);
-    console.log(`Balance for ${walletAddress} is ${balance}`);
-
-    return balance;
-
-}
-
-const fetchTransactionHistory = async (walletAddress:string) => {
-    const transactions = await getTransactions(walletAddress);
-    console.log(`Transactions for ${walletAddress} :`,transactions);
-
-}
-
-const handleWalletImport = async (mnemonic:string , walletName : string) =>{
-    if(!validateMnemonic(mnemonic)){
-        console.error('Invalid Mnemonic');
+    store.dispatch(setSyncStatus('syncing'));
+    
+    if(syncQueue.length == 0) {
+        store.dispatch(setSyncStatus('synced'));
         return;
     }
-    const address = await generateWalletAddress(mnemonic);
-    
-    addToQueue(address);
-    
-    if(syncQueue.length == 1){
-        processSyncQueue();
-    }
-}
 
-const stopSyncQueue = () => {
-    syncQueue = [];
+    try{ 
+        const syncItem = syncQueue[0];
+
+        console.log(`Processing SyncItem : ${syncItem}`)
+
+        if(syncItem.type == 'balance'){
+            const balance = await fetchBalance(syncItem.walletAddress);
+            store.dispatch(setBalance({walletAddress:syncItem.walletAddress , balance:balance}))
+        } else if (syncItem.type == 'history'){
+            const history= await fetchHistory(syncItem.walletAddress);
+            store.dispatch(setTransactions({walletAddress:syncItem.walletAddress 
+                , transactions:history
+            }))
+        }
+
+        store.dispatch(processNextSyncItem()); 
+
+        await new Promise((resolve) => setTimeout(resolve, 200)).then(()=>{
+            processSyncItems();
+        })
+    }
+        catch(error){
+            
+            console.log('Error',error);
+        }
+    
+
+    store.dispatch(setSyncStatus('synced'));
     
 }

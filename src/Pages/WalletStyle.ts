@@ -4,7 +4,7 @@ const WalletPageContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  background-color: #1E2328;
+  background-color: #161c23;
   color: white;
   height: 100vh;
 `;
@@ -17,13 +17,13 @@ const HeaderContainer = styled.div`
 `;
 
 const TotalCoins = styled.div`
-  font-size: 24px;
-  color: #C0996F;
+  font-size: 18px;
+  color: #adabaa;
 `;
 
 const ImportButton = styled.button`
-  background-color: #C0996F;
-  color: white;
+  background-color: #242830;
+  color:#adabaa;
   border: none;
   padding: 10px 20px;
   font-size: 18px;
@@ -32,6 +32,7 @@ const ImportButton = styled.button`
 
   &:hover {
     background-color: #a67a4e;
+    color:white;
   }
 `;
 
@@ -107,6 +108,8 @@ const CoinListTable = styled.table`
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  border-spacin:25px;
+  font-size:18px;
 `;
 
 const CoinListHeader = styled.th`
@@ -117,14 +120,17 @@ const CoinListHeader = styled.th`
 `;
 
 const CoinListRow = styled.tr`
-  &:nth-child(even) {
-    background-color: #2c3e50;
-  }
+  
+    background-color:  #161C23;
+    margin-top:20px;
+
+  
 `;
 
 const CoinListData = styled.td`
   padding: 10px;
   color: white;
+  margin-top:20px;
 
   .delete-button {
     background: none;

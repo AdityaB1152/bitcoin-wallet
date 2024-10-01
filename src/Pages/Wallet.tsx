@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FaTrash } from 'react-icons/fa'; 
-import {generateWalletAddress , getBalance} from '../api/wallet'
+
 import { CloseButton, CoinListContainer, CoinListData, CoinListHeader, CoinListRow, CoinListTable, HeaderContainer, ImportButton, InputField, ModalContent, ModalHeader, ModalOverlay, SubmitButton, TotalCoins, WalletPageContainer } from './WalletStyle';
+
+import { useAppDispatch } from '../hooks/hooks';
+import { useSelector } from 'react-redux';
+import store, { RootState } from '../store';
+import { stat } from 'fs';
+import { handleWalletImport } from '../api/wallet';
+import { removeWallet } from '../slices/walletSlice';
 
 
 const dummyCoins = [
@@ -19,21 +26,37 @@ const WalletPage: React.FC = () => {
   const [walletName, setWalletName] = useState('');
   const [mnemonic, setMnemonic] = useState('');
 
+  const dispatch = useAppDispatch()
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+  const syncQueue = useSelector((state:RootState)=>state.syncQueue);
+  const balances = useSelector((state:RootState)=>state.balances);
+  const wallets = useSelector((state:RootState)=>state.wallets.wallets);
 
 
-  /* 
+  const handleWalletDelete = (walletAddress:string) =>{
 
-  User Enters Name/Mnemonic --> Calls the generateWallet API (gets address as a response)
-  --> Fetches the Balance --> Adds it to Redux State
-    
-  */
+    try{
+      store.dispatch(removeWallet(walletAddress));
 
-  const handleSubmit = (event: React.FormEvent) => {
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
+
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
    
-
+   try{ 
+    
+     handleWalletImport(walletName , mnemonic);
+     console.log(syncQueue);
+  
+  } catch(error){
+    console.log(error);
+   }
     
     
     console.log('Wallet Name:', walletName);
@@ -80,18 +103,22 @@ const WalletPage: React.FC = () => {
         <CoinListTable>
           <thead>
             <tr>
+              <CoinListHeader>Name</CoinListHeader>
+              <CoinListHeader>Address</CoinListHeader>
               <CoinListHeader>Coin</CoinListHeader>
               <CoinListHeader>Holding</CoinListHeader>
               <CoinListHeader>Action</CoinListHeader>
             </tr>
           </thead>
           <tbody>
-            {dummyCoins.map((coin) => (
-              <CoinListRow key={coin.id}>
-                <CoinListData>{coin.coin}</CoinListData>
-                <CoinListData>{coin.holding}</CoinListData>
+            {wallets.map((wallet) => (
+              <CoinListRow key={wallet.address}>
+                <CoinListData>{wallet.name}</CoinListData>
+                <CoinListData>{wallet.address}</CoinListData>
+                <CoinListData>BTC</CoinListData>
+                <CoinListData>{balances[wallet.address]/100000000}</CoinListData>
                 <CoinListData>
-                  <button className="delete-button" type="button">
+                  <button className="delete-button" type="button" onClick={()=>{handleWalletDelete(wallet.address)}}>
                     <FaTrash /> {/* Using a trash icon */}
                   </button>
                 </CoinListData>
@@ -100,7 +127,10 @@ const WalletPage: React.FC = () => {
           </tbody>
         </CoinListTable>
       </CoinListContainer>
+
+       
     </WalletPageContainer>
+    
   );
 };
 

@@ -1,9 +1,9 @@
 import { createSlice , PayloadAction } from "@reduxjs/toolkit";
-import { stat } from "fs";
+
+
 
 interface Wallet {
     name :string,
-    mnemonic : string,
     address : string,
 }
 

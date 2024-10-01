@@ -11,7 +11,7 @@ left: 70px;
 gap: 0px;
 opacity: 0px;
   border-radius: 20px;
-  background-color: #161c23;
+  background-color: #282C34;
   
   display: flex;
   flex-direction: column;
@@ -61,7 +61,7 @@ const SidebarLink = styled(NavLink)`
   }
 
   &:hover {
-    background-color: #34495e;
+    background-color: #242830;
   }
 `;
 
