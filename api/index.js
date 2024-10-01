@@ -67,36 +67,14 @@ const getBalance = async (walletAddress) => {
     }
 }
 
-// const getTransactions = async (walletAddress) => {
-//     try{
-//         const blckCypherRes = await axios.get(`${BASE_URL}/addrs/${walletAddress}/full`)
-//         let transactions = [] , txns = [];
-//         let balance = blckCypherRes.data.balance
-//          txns = blckCypherRes.data.txs;
-//         txns.forEach(transaction => {
-//             transactions.push({
-//                 addresses:transaction.addresses,
-//                 total:transaction.total,
-//                 confirmed:transaction.confirmed
-//             });
-//         });
-//         let response = {
-//             walletAddress:walletAddress,
-//             balance:balance,
-//             transactions:transactions,
-//         }
-//         return response;
-//     } catch(error) {
-//         console.log(error);
-//     }
-// }
+
 
 const getTransactions = async (walletAddress) => {
     try {
         const blckCypherRes = await axios.get(`${BASE_URL}/addrs/${walletAddress}/full`);
         let transactions = [];
         let txns = blckCypherRes.data.txs;
-        let balance = blckCypherRes.data.balance / 100000000; // Convert satoshis to BTC
+        let balance = blckCypherRes.data.balance / 100000000; 
 
         txns.forEach(transaction => {
             const { confirmations, inputs, outputs, confirmed } = transaction;
@@ -108,7 +86,7 @@ const getTransactions = async (walletAddress) => {
             outputs.forEach((output) => {
                
                     transactions.push({
-                        amount: output.value / 100000000, // Convert satoshis to BTC
+                        amount: output.value / 100000000,
                         status: status,
                         type: 'Received',
                         confirmedAt: confirmed,
@@ -119,7 +97,7 @@ const getTransactions = async (walletAddress) => {
             inputs.forEach(input => {
                
                     transactions.push({
-                        amount: input.output_value / 100000000, // Convert satoshis to BTC
+                        amount: input.output_value / 100000000, 
                         status: status,
                         type: 'Sent',
                         confirmedAt: confirmed,
@@ -137,9 +115,11 @@ const getTransactions = async (walletAddress) => {
         return response;
     } catch (error) {
         console.log(error);
-        return null; // Handle the error gracefully by returning null
+        return null; 
     }
 };
+
+// *---------------API ROUTES----------------------------------------------------
 
 app.listen(port, () => {
     console.log(`Server Running on PORT ${port}`);

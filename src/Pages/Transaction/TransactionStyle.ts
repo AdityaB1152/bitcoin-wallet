@@ -34,7 +34,7 @@ export const TransactionListTable = styled.table`
 `;
 
 export const TransactionListHeader = styled.th`
-  background-color: #34495e;
+  background-color: #282C34;
   padding: 10px;
   text-align: left;
   color: #C0996F;
@@ -42,7 +42,7 @@ export const TransactionListHeader = styled.th`
 
 export const TransactionListRow = styled.tr`
   &:nth-child(even) {
-    background-color: #2c3e50;
+    background-color: #282C34;
   }
 `;
 

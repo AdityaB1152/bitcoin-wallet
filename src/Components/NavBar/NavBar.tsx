@@ -5,6 +5,7 @@ import { FaSync } from 'react-icons/fa';
 import store, { RootState } from '../../store';
 import { setSyncStatus } from '../../slices/syncQueueSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { syncNow } from '../../api/SyncItem';
 
 const NavbarContainer = styled.nav`
   display: flex;
@@ -39,11 +40,11 @@ const Navbar: React.FC = () => {
   const dispatch = useDispatch()
   const syncQueue = store.getState().syncQueue.queue;
   const syncStatus = useSelector((state:RootState)=> state.syncQueue.status);
-  const [btcTxt , setBtcTxt] = useState('Sync');
+  
  
 
   const handleSync = () => {
-    store.dispatch(setSyncStatus('syncing'));
+    syncNow();
   };
 
   return (

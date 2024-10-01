@@ -3,13 +3,18 @@ import store from '../store';
 import { addWallet } from '../slices/walletSlice';
 import { addSyncItem, setSyncStatus } from '../slices/syncQueueSlice';
 import { processSyncItems } from './SyncItem';
-let tempWalletAdd = 'n1SNK7QJkoN6yPWPb4ZmNpRCkcQDTCg46s'
+import { validateMnemonic } from 'bip39';
+
+// ? TEMPORARY WALLET ADDRESS FOR TESTING.
+// TODO : Uncomment and replace walletAddress with temWalletAdd for testing
+// let tempWalletAdd = 'n1SNK7QJkoN6yPWPb4ZmNpRCkcQDTCg46s'
 const req = axios.default
 const BASE_URL = 'http://localhost:5000'
 
 
 export const handleWalletImport = async (name:string , mnemonic:string) => {
-        console.log('Calling')
+
+   
     await generateWalletAddress(mnemonic).then((address)=>{
         
         console.log(`Retrived Wallet Address from Mnemonic:${address}`);
@@ -42,10 +47,6 @@ export const handleWalletImport = async (name:string , mnemonic:string) => {
          processSyncItems();
     
     });
-
-  
-
-
 }
 
 const generateWalletAddress = async (mnemonic:string) => {
@@ -64,7 +65,7 @@ export const fetchBalance = async (walletAddress:string) => {
 
         try{
             const resp = await req.post(`${BASE_URL}/getBalance`,{
-                walletAddress:tempWalletAdd
+                walletAddress:walletAddress
             });
             return resp.data.balance;
         } catch(error){
@@ -76,7 +77,7 @@ export const fetchBalance = async (walletAddress:string) => {
 export const fetchHistory = async (walletAddress:string) =>{
         try{
             const resp = await req.post(`${BASE_URL}/getTransactions`,{
-                walletAddress:tempWalletAdd
+                walletAddress:walletAddress
             });
             return resp.data.transactions;
         } catch(error){

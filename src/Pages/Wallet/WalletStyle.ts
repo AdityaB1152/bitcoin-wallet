@@ -113,7 +113,7 @@ const CoinListTable = styled.table`
 `;
 
 const CoinListHeader = styled.th`
-  background-color: #34495e;
+  background-color: #282C34;
   padding: 10px;
   text-align: left;
   color: #C0996F;

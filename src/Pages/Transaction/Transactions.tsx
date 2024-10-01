@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { PageTitle, TransactionListContainer, TransactionListData, TransactionListHeader, TransactionListRow, TransactionListTable, TransactionsPageContainer } from './TransactionStyle';
-import { HeaderContainer } from './WalletStyle';
+import { HeaderContainer, TotalCoins } from '../Wallet/WalletStyle';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import { RootState } from '../../store';
 import { stat } from 'fs';
 import { address } from 'bitcoinjs-lib';
 
@@ -13,7 +13,8 @@ interface Transaction{
   address:string,
   amount:number,
   status: string,
-  type:string
+  type:string,
+  date:string
 }
 
 
@@ -44,6 +45,7 @@ wallets.forEach((wallet)=>{
       amount:trans.amount,
       status:trans.status,
       type:trans.type,
+      date:trans.confirmedAt
     }
 
     txs.push(obj);
@@ -54,6 +56,7 @@ wallets.forEach((wallet)=>{
     <TransactionsPageContainer>
       <HeaderContainer>
         <PageTitle>Transactions</PageTitle>
+        <TotalCoins>Total Transactions: {txs.length} </TotalCoins>
       </HeaderContainer>
 
       {/* Transaction List */}
@@ -62,7 +65,7 @@ wallets.forEach((wallet)=>{
           <thead>
             <tr>
               <TransactionListHeader>Wallet</TransactionListHeader>
-              <TransactionListHeader>Address</TransactionListHeader>
+              <TransactionListHeader>Confirmed At</TransactionListHeader>
               <TransactionListHeader>Amount</TransactionListHeader>
               <TransactionListHeader>Result</TransactionListHeader>
               <TransactionListHeader>Status</TransactionListHeader>
@@ -72,7 +75,7 @@ wallets.forEach((wallet)=>{
             {txs.map((transaction) => (
               <TransactionListRow >
                 <TransactionListData>{transaction.wallet}</TransactionListData>
-                <TransactionListData>{transaction.address}</TransactionListData>
+                <TransactionListData>{transaction.date}</TransactionListData>
                 <TransactionListData>{transaction.amount} BTC</TransactionListData>
                 <TransactionListData>{transaction.type}</TransactionListData>
                 <TransactionListData>{transaction.status}</TransactionListData>

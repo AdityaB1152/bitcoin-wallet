@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FaTrash } from 'react-icons/fa'; 
+import { IoIosAddCircle } from "react-icons/io";
 
 import { CloseButton, CoinListContainer, CoinListData, CoinListHeader, CoinListRow, CoinListTable, HeaderContainer, ImportButton, InputField, ModalContent, ModalHeader, ModalOverlay, SubmitButton, TotalCoins, WalletPageContainer } from './WalletStyle';
 
-import { useAppDispatch } from '../hooks/hooks';
+import { useAppDispatch } from '../../hooks/hooks';
 import { useSelector } from 'react-redux';
-import store, { RootState } from '../store';
+import store, { RootState } from '../../store';
 import { stat } from 'fs';
-import { handleWalletImport } from '../api/wallet';
-import { removeWallet } from '../slices/walletSlice';
+import { handleWalletImport } from '../../api/wallet';
+import { removeWallet } from '../../slices/walletSlice';
+import { deleteBalance, deleteTransactions } from '../../slices/balanceTransactionSlice';
 
 
 const dummyCoins = [
@@ -33,11 +35,20 @@ const WalletPage: React.FC = () => {
   const balances = useSelector((state:RootState)=>state.balances);
   const wallets = useSelector((state:RootState)=>state.wallets.wallets);
 
+  let totalBalance:number = 0 ;
+
+   Object.entries(balances).map(([walletName,balance])=>{
+    totalBalance = totalBalance + balance/100000000;
+   })
+
 
   const handleWalletDelete = (walletAddress:string) =>{
 
     try{
       store.dispatch(removeWallet(walletAddress));
+      store.dispatch(deleteBalance({walletAddress:walletAddress}));
+      store.dispatch(deleteTransactions({walletAddress:walletAddress}));
+
 
     } catch (error) {
       console.log(error);
@@ -67,7 +78,7 @@ const WalletPage: React.FC = () => {
   return (
     <WalletPageContainer>
       <HeaderContainer>
-        <TotalCoins>Total Coins: 1000</TotalCoins>
+        <TotalCoins>Total Balance: {totalBalance} BTC</TotalCoins>
         <ImportButton onClick={openModal}>Import Wallet</ImportButton>
       </HeaderContainer>
 
