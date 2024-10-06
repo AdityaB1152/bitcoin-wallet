@@ -107,7 +107,7 @@ The project is properly set up with **Typescript**, **ReactJS**, and **react-rou
 ### Redux Integration
 
 - **Redux** is used for state management to handle wallets, balances, and transaction data.
-- Async actions are handled with `redux-thunk` or `redux-saga`.
+
 
 ### Actions and Reducers
 
